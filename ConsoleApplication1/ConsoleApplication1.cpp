@@ -7,13 +7,19 @@ int max(int elements[], int size);
 int fibonacci_recursive(int n);
 // calculates the fibonacci sequence up for n using an iterative algorithm
 int fibonacci_iterative(int n);
+void harness_search(int haystack[], int size, int needle, char* description, int(*impl)(int haystack[], int size, int needle));
 // searches for an element in an array and returns the position ( -1 if not found )
 int search(int haystack[], int size, int needle);
+// binary search
+int search_binary(int haystack[], int size, int needle);
 
 int main(int argc, char* argv[])
 {
 	int input[] = { 5, -1, 4, 12 };
 	int input_size = 4;
+
+	int input_sorted[] = { -4, 1, 22, 66, 89, 120, 238 };
+	int input_sorted_size = 7;
 	
 	// 2. function pointers
 	// direct invocation
@@ -27,8 +33,14 @@ int main(int argc, char* argv[])
 	printf("iterative fibonacci(12) = %d\n", fibonacci_iterative(12));
 
 	// 4. search
-	printf("search(4) = %d\n", search(input, input_size, 4));
-	printf("search(2) = %d\n", search(input, input_size, 2));
+	// 4a. simple search 
+	harness_search(input, input_size, 4, "search", search);
+	harness_search(input, input_size, 2, "search", search);
+	// 4b. binary search
+	harness_search(input_sorted, input_sorted_size, 89, "search_binary", search_binary);
+	harness_search(input_sorted, input_sorted_size, 500, "search_binary", search_binary);
+	harness_search(input_sorted, input_sorted_size, -40, "search_binary", search_binary);
+	harness_search(input_sorted, input_sorted_size, 140, "search_binary", search_binary);
 
 	return 0;
 }
@@ -86,6 +98,10 @@ int fibonacci_iterative(int n)
 	return result;
 }
 
+void harness_search(int haystack[], int size, int needle, char* description, int(*impl)(int haystack[], int size, int needle)) {
+	printf("%s(%d) = %d\n", description, needle, impl(haystack, size, needle));
+}
+
 int search(int haystack[], int size, int needle)
 {
 	int i;
@@ -94,4 +110,32 @@ int search(int haystack[], int size, int needle)
 
 	// if position is smaller than size, then we found the needle ; otherwise return -1
 	return i < size ? i : -1;
+}
+
+int search_binary_helper(int haystack[], int left, int right, int needle)
+{
+	if (left > right) {
+		return -1;
+	}
+
+	int mid = (left + right) / 2;
+	int mid_value = haystack[mid];
+
+	// key has been found
+	if (mid_value == needle)
+	{
+		return mid;
+	} // key is in upper subset
+	else if (mid_value < needle)
+	{
+		return search_binary_helper(haystack, mid + 1, right, needle);
+	} // key is in lower subset
+	else 
+	{
+		return search_binary_helper(haystack, left, mid - 1, needle);
+	}
+}
+
+int search_binary(int haystack[], int size, int needle) {
+	return search_binary_helper(haystack, 0, size - 1, needle);
 }
