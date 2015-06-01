@@ -65,6 +65,7 @@ int fibonacci_recursive(int n)
 int fibonacci_iterative(int n)
 {
 
+	// TODO - should be possible to use it in a queue manner and only hold the last 2 values
 	int* accumulator = (int *) malloc( (n+1) * sizeof(int)) ;
 
 	for (int i = 0; i <= n; i++)
