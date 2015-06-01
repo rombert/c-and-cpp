@@ -7,21 +7,29 @@ int max(int elements[], int size);
 int fibonacci_recursive(int n);
 // calculates the fibonacci sequence up for n using an iterative algorithm
 int fibonacci_iterative(int n);
+// searches for an element in an array and returns the position ( -1 if not found )
+int search(int haystack[], int size, int needle);
 
 int main(int argc, char* argv[])
 {
 	int input[] = { 5, -1, 4, 12 };
+	int input_size = 4;
 	
 	// 2. function pointers
 	// direct invocation
-	printf("Max is %d\n", max(input, 4));
+	printf("Max is %d\n", max(input, input_size));
 	// function pointer invocation
 	int(*sortfunc)(int elements[], int size) = max;
-	printf("Max (function pointer) %d\n", sortfunc(input, 4));
+	printf("Max (function pointer) %d\n", sortfunc(input, input_size));
 
 	// 3. recursivity
 	printf("recursive fibonacci(12) = %d\n", fibonacci_recursive(12));
 	printf("iterative fibonacci(12) = %d\n", fibonacci_iterative(12));
+
+	// 4. search
+	printf("search(4) = %d\n", search(input, input_size, 4));
+	printf("search(2) = %d\n", search(input, input_size, 2));
+
 	return 0;
 }
 
@@ -75,4 +83,14 @@ int fibonacci_iterative(int n)
 	free(accumulator);
 
 	return result;
+}
+
+int search(int haystack[], int size, int needle)
+{
+	int i;
+	// loop until either we reach the end OR find the needle in the haystack
+	for (i = 0; i < size && haystack[i] != needle; i++);
+
+	// if position is smaller than size, then we found the needle ; otherwise return -1
+	return i < size ? i : -1;
 }
