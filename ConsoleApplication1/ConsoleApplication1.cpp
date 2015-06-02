@@ -1,5 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
+typedef struct {
+	char* nume;
+	int grupa;
+	int an_studiu;
+} STUDENT;
 
 // returns the maximum element from an array
 int max(int elements[], int size);
@@ -18,6 +25,14 @@ void sort_merge(int haystack[], int size);
 void write_matrix_to_file(int matrix[4][4], char* file_name);
 // read a fixed-size matrix from a file
 void read_matrix_from_file(int matrix[4][4], char* file_name);
+// append a student's data to the file
+void student_append(STUDENT student, char* file_name);
+// print all students to STDOUT
+void student_print_all(char* file_name);
+// finds ecuation root using the bisection method
+float bisection(float a, float b, float(*fun)(float x));
+// equation for the bisection method
+float equation(float x);
 
 //
 // Utilities
@@ -35,7 +50,7 @@ int main(int argc, char* argv[])
 
 	int input_sorted[] = { -4, 1, 22, 66, 89, 120, 238 };
 	int input_sorted_size = 7;
-	
+
 	// 2. function pointers
 	// direct invocation
 	printf("Max is %d\n", max(input, input_size));
@@ -70,16 +85,41 @@ int main(int argc, char* argv[])
 
 	// 5. file access
 	int matrix[4][4] = {
-		{1,2,3,4},
-		{5,6,7,8},
-		{-1,-2,-3,-4},
-		{9,78,12,-1}
+		{ 1, 2, 3, 4 },
+		{ 5, 6, 7, 8 },
+		{ -1, -2, -3, -4 },
+		{ 9, 78, 12, -1 }
 	};
 	write_matrix_to_file(matrix, "matrix.txt");
 	int matrix_out[4][4];
 	read_matrix_from_file(matrix_out, "matrix.txt");
 	printf("Matrix read from file:\n");
 	print_matrix(matrix_out);
+
+	// 6/7. binary file access
+	// delete 'db' before using
+	unlink("students.dat");
+	STUDENT student1;
+	student1.an_studiu = 1;
+	student1.grupa = 1014;
+	student1.nume = "Salut";
+
+	STUDENT student2;
+	student2.an_studiu = 2;
+	student2.grupa = 1084;
+	student2.nume = "Pa";
+	
+	student_append(student1, "students.dat");
+	student_append(student2, "students.dat");
+
+	student_print_all("students.dat");
+
+	// XX. bisection method
+	// f(x) = x^3 - x - 2
+	// f(1) = -2
+	// f(2) = -4
+	int res = bisection(1, 2, equation);
+	printf("Bisected x to be %d\n", res);
 
 	return EXIT_SUCCESS;
 }
@@ -280,6 +320,51 @@ void read_matrix_from_file(int matrix[4][4], char* file_name)
 	}
 }
 
+void student_append(STUDENT student, char* file_name)
+{
+	FILE* out = fopen(file_name, "ab");
+	if (!out)
+	{
+		printf("Unable to open file\n");
+		return;
+	}
+
+	// move to end of file
+	fwrite(&student, sizeof(STUDENT), 1, out);
+	fclose(out);
+}
+
+float equation(float x)
+{
+	return x*x*x - x - 2;
+}
+
+float bisection(float a, float b, float(*fun)(float x))
+{
+	int max_iter = 10;
+	float allowed_error = 0.01;
+	float x, new_x, iter = 0;
+	// initial guess
+	x = (a + b) / 2;
+	do {
+		if (fun(a) * fun(x) < 0) {
+			b = x;
+		}
+		else {
+			a = x;
+		}
+		new_x = (a + b) / 2;
+		iter++;
+		if (fabs(new_x - x) < allowed_error) {
+			break;
+		}
+		x = new_x;
+		
+	} while (iter < max_iter);
+
+	return x;
+}
+
 void print_array(int values[], int size) {
 	printf("[");
 	for (int i = 0; i < size; i++)
@@ -301,5 +386,23 @@ void print_matrix(int matrix[4][4]) {
 			printf("%5d ", matrix[i][j]);
 		}
 		printf("\n");
+	}
+}
+
+void student_print_all(char* file_name)
+{
+	FILE* db = fopen(file_name, "rb");
+	if (!db)
+	{
+		printf("Unable to open file for reading\n");
+		return;
+	}
+	
+	// TODO - lists last record twice
+	while (!feof(db))
+	{
+		STUDENT student;
+		fread(&student, sizeof(STUDENT), 1, db);
+		printf("Read STUDENT: %d, %d, %s\n", student.an_studiu, student.grupa, student.nume);
 	}
 }
