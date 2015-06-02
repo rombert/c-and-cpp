@@ -25,6 +25,8 @@ void read_matrix_from_file(int matrix[4][4], char* file_name);
 
 // prints all values of an array
 void print_array(int values[], int size);
+// print all values of a (fixed-size) matrix
+void print_matrix(int matrix[4][4]);
 
 int main(int argc, char* argv[])
 {
@@ -74,6 +76,10 @@ int main(int argc, char* argv[])
 		{9,78,12,-1}
 	};
 	write_matrix_to_file(matrix, "matrix.txt");
+	int matrix_out[4][4];
+	read_matrix_from_file(matrix_out, "matrix.txt");
+	printf("Matrix read from file:\n");
+	print_matrix(matrix_out);
 
 	return EXIT_SUCCESS;
 }
@@ -239,19 +245,6 @@ void sort_merge(int haystack[], int size)
 	sort_merge_helper_sort(haystack, 0, size - 1);
 }
 
-void print_array(int values[], int size) {
-	printf("[");
-	for (int i = 0; i < size; i++)
-	{
-		printf("%d", values[i]);
-		if (i != size - 1)
-		{
-			printf(",");
-		}
-	}
-	printf("]\n");
-}
-
 void write_matrix_to_file(int matrix[4][4], char* file_name)
 {
 	FILE* out = fopen(file_name, "w");
@@ -268,4 +261,45 @@ void write_matrix_to_file(int matrix[4][4], char* file_name)
 		}
 	}
 	fclose(out);
+}
+
+void read_matrix_from_file(int matrix[4][4], char* file_name)
+{
+	FILE* out = fopen(file_name, "r");
+	if (!out)
+	{
+		printf("Unable to open file for reading\n");
+		return;
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			fscanf(out, "%d,", &matrix[i][j]);
+		}
+	}
+}
+
+void print_array(int values[], int size) {
+	printf("[");
+	for (int i = 0; i < size; i++)
+	{
+		printf("%d", values[i]);
+		if (i != size - 1)
+		{
+			printf(",");
+		}
+	}
+	printf("]\n");
+}
+
+void print_matrix(int matrix[4][4]) {
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			printf("%5d ", matrix[i][j]);
+		}
+		printf("\n");
+	}
 }
