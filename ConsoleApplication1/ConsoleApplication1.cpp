@@ -34,6 +34,8 @@ float bisection(float a, float b, float(*fun)(float x));
 // equation for the bisection method
 float equation(float x);
 
+int gcd(int a, int b);
+
 //
 // Utilities
 //
@@ -120,6 +122,8 @@ int main(int argc, char* argv[])
 	// f(2) = -4
 	int res = bisection(1, 2, equation);
 	printf("Bisected x to be %d\n", res);
+
+	printf("GCD: %d\n", gcd(299792458, 6447287));
 
 	return EXIT_SUCCESS;
 }
@@ -363,6 +367,15 @@ float bisection(float a, float b, float(*fun)(float x))
 	} while (iter < max_iter);
 
 	return x;
+}
+
+int gcd(int a, int b) {
+	if (a == 0)
+	{
+		return b;
+	}
+
+	return gcd(b %a, a);
 }
 
 void print_array(int values[], int size) {
